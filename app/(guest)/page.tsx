@@ -1,3 +1,5 @@
+'use client'
+
 import Footer from "@/components/footer";
 import SearchComponent from "@/components/search-component";
 import { Button } from "@/components/ui/button";
