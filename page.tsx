@@ -37,7 +37,7 @@ export default function HomePage() {
             </Link>
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/my-bookings" className="text-sm font-medium hover:underline underline-offset-4 mr-4">
+            <Link href="/guest/mybookings" className="text-sm font-medium hover:underline underline-offset-4 mr-4">
               My Bookings
             </Link>
             <Link href="/dashboard" className="text-sm font-medium hover:underline underline-offset-4 mr-4">

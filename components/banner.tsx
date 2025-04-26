@@ -33,7 +33,7 @@ function Banners() {
                                     Signout
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Link href='/mybookings'>My bookings</Link>
+                                    <Link href='/guest/mybookings'>My bookings</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                 <Link href='/dashboard'>Admin</Link>
@@ -45,7 +45,7 @@ function Banners() {
                     </div>
 
                     <div className="hidden sm:flex gap-x-4 items-center">
-                        <Link href='/mybookings'>My bookings</Link>
+                        <Link href='/guest/mybookings'>My bookings</Link>
                         <Link href='/dashboard'>Admin</Link>
                         <SignedOut>
                             <SignInButton />

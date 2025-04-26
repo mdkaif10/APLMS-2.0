@@ -42,7 +42,7 @@ export default function RootLayout({
           >
             <ClerkLoaded>
               <Navigation />
-              <main>{children}</main>
+              <main className="pt-16 min-h-screen">{children}</main>
             </ClerkLoaded>
             <Toaster />
           </ThemeProvider>
