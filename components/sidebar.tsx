@@ -3,6 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 import ActiveLink from './active-link'
 import { UserButton } from '@clerk/nextjs'
+import { Mail, Users } from 'lucide-react'
 
 export interface MenuItem {
     id: string,
@@ -34,6 +35,22 @@ function Sidebar() {
             <li>
               <ActiveLink href='/dashboard/revenue'>
                 Revenue
+              </ActiveLink>
+            </li>
+            <li>
+              <ActiveLink href='/dashboard/messages'>
+                <div className="flex items-center">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Messages
+                </div>
+              </ActiveLink>
+            </li>
+            <li>
+              <ActiveLink href='/dashboard/users'>
+                <div className="flex items-center">
+                  <Users className="h-4 w-4 mr-2" />
+                  Users
+                </div>
               </ActiveLink>
             </li>
           </ul>
