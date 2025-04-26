@@ -7,65 +7,51 @@ import Link from 'next/link'
 import { buttonVariants } from './ui/button'
 
 function SearchResult({
-    locations, params
+    locations,
+    params
 }: {
     locations: MapParams[],
     params: SearchParams
 }) {
-    console.log(locations)
-  return (
-    <>
-    {
-        locations.filter(loc => loc.type === MapAddressType.PARKINGLOCATION).map((loc, index) => (
-
-            <Card key={loc.address}>
-                <CardHeader>
-                    <CardTitle className='text-white w-6 h-6 rounded-full bg-black text-center'>
-                        {index + 1}
-                    </CardTitle>
-                    <CardDescription className='text-lg font-bold'>
-                        {getStreetFromAddress(loc.address)}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="mb-4 grid grid-cols-1 items-start last:mb-0 last:pb-0">
-                        <div className="space-y-2 pb-2">
-                            <div className="grid grid-cols-2">
-                                <p className="text-sm">
-                                    Hourly price:
-                                </p>
-                                <p className="text-sm">
-                                    {formatAmountForDisplay(loc.price?.hourly!, 'INR')}
-                                </p>
+    return (
+        <div className="divide-y divide-gray-200">
+            {locations
+                .filter(loc => loc.type === MapAddressType.PARKINGLOCATION)
+                .map((loc, index) => (
+                    <div key={loc.address} className="p-4 hover:bg-gray-50">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-sm">
+                                {index + 1}
                             </div>
-                            <div className="grid grid-cols-2">
-                                <p className="text-sm">
-                                    Spots available:
-                                </p>
-                                <p className="text-sm">
-                                    {loc.numberofspots! - loc.bookedspots!}
-                                </p>
+                            <h3 className="font-semibold">
+                                {getStreetFromAddress(loc.address)}
+                            </h3>
+                        </div>
+                        <div className="space-y-2 text-sm text-gray-600">
+                            <div className="flex justify-between">
+                                <span>Hourly price:</span>
+                                <span className="font-medium">{formatAmountForDisplay(loc.price?.hourly!, 'INR')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Spots available:</span>
+                                <span className="font-medium">{loc.numberofspots! - loc.bookedspots!}</span>
                             </div>
                         </div>
-
-                        <hr />
-
-                        {
-                            params && 
+                        {params && (loc.numberofspots! - loc.bookedspots!) > 0 && (
                             <Link
-                                className={cn(buttonVariants({variant: 'outline'}), 'bg-primary text-white',
-                                `${(loc.numberofspots! - loc.bookedspots!) === 0 ? 'hidden' : 'flex' }`
+                                className={cn(
+                                    buttonVariants({ variant: 'default' }),
+                                    'w-full mt-4 bg-black text-white hover:bg-gray-800'
                                 )}
                                 href={`book/${loc.id}?date=${params.arrivingon}&starttime=${params.arrivingtime}&endtime=${params.leavingtime}`}
-                            >Book</Link>
-                        }
+                            >
+                                Book Now
+                            </Link>
+                        )}
                     </div>
-                </CardContent>
-            </Card>
-        ))
-    }
-    </>
-  )
+                ))}
+        </div>
+    )
 }
 
 export default SearchResult

@@ -1,19 +1,21 @@
-
 import { LatLng } from '@/types'
 import React, { useEffect, useRef, useState } from 'react'
 import { useJsApiLoader } from '@react-google-maps/api'
 import { libs } from '@/lib/utils'
 import { Input } from './ui/input'
+import { cn } from '@/lib/utils'
 
 type AddressAutoCompleteInputProps = {
     onAddressSelect: (address: string, gpscoords: LatLng) => void,
-    selectedAddress?: string
+    selectedAddress?: string,
+    className?: string
 }   
 
 function AddressAutoCompleteInput({
-    onAddressSelect, selectedAddress
+    onAddressSelect,
+    selectedAddress,
+    className
 } : AddressAutoCompleteInputProps) {
-
     const [autoComplete, setAutoComplete] = 
     useState<google.maps.places.Autocomplete | null>(null)
 
@@ -26,7 +28,6 @@ function AddressAutoCompleteInput({
     const placesAutoCompleteRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
-
         if (isLoaded) {
             const ontarioBounds = new google.maps.LatLngBounds(
                 new google.maps.LatLng({ lat: 48.4026688, lng: -89.4053302 }), // south west
@@ -58,9 +59,13 @@ function AddressAutoCompleteInput({
         setTimeout(() => (document.body.style.pointerEvents = ""), 0)
     })
 
-  return (
-    <Input ref={placesAutoCompleteRef} defaultValue={selectedAddress} />
-  )
+    return (
+        <Input 
+            ref={placesAutoCompleteRef} 
+            defaultValue={selectedAddress}
+            className={cn(className)}
+        />
+    )
 }
 
 export default AddressAutoCompleteInput

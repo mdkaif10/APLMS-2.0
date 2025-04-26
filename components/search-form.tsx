@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { Input } from './ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel } from './ui/form'
-import { Label } from './ui/label'
 import { z } from 'zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,6 +10,7 @@ import TimeSelect from './time-select'
 import { LatLng } from '@/types'
 import AddressAutoCompleteInput from './address-autocomplete.input'
 import { format } from 'date-fns'
+import { MapPin, CalendarIcon, Clock, Search } from 'lucide-react'
 
 const FormSchema = z.object({
     address: z.string(),
@@ -31,11 +31,12 @@ const FormSchema = z.object({
 })
 
 function SearchForm({
-    onSearch
+    onSearch,
+    className
 }: {
     onSearch: (data: any) => void
+    className?: string
 }) {
-
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -55,67 +56,90 @@ function SearchForm({
     }, [arrivingTime, form])
 
     function onSubmit(formData: z.infer<typeof FormSchema>) {
-        
         const data = { ...formData, arrivingon: format(formData.arrivingon, 'yyyy-MM-dd')}
-
         onSearch(data)
     }
 
     const handleAddressSelect = (address: string, gpscoords: LatLng) => {
         form.setValue('address', address)
         form.setValue('gpscoords', gpscoords)
-
     }
+
     return (
-        <div className="flex flex-col lg:flex-row">
-            <div className='grid gap-y-1.5 lg:w-1/2'>
-                <Label htmlFor='parkingat'>Address</Label>
-                <AddressAutoCompleteInput onAddressSelect={handleAddressSelect} selectedAddress='' />
-            </div>
-
+        <div className={`bg-white rounded-lg p-6 text-gray-900 ${className}`}>
+            <h2 className="text-2xl font-semibold mb-6">Find Parking</h2>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="gap-y-2 grid grid-cols-1 lg:grid-cols-4 gap-x-32 items-end">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <div>
+                        <label className="flex items-center gap-2 text-sm font-medium mb-2">
+                            <MapPin className="h-4 w-4" />
+                            Address
+                        </label>
+                        <AddressAutoCompleteInput 
+                            onAddressSelect={handleAddressSelect} 
+                            selectedAddress='' 
+                            className="w-full"
+                        />
+                    </div>
 
-                    <FormField 
+                    <FormField
                         control={form.control}
                         name='arrivingon'
                         render={({ field }) => (
-                            <FormItem className='lg:w-[250px] grid'>
-                                <FormLabel>Arriving on</FormLabel>
+                            <FormItem>
+                                <label className="flex items-center gap-2 text-sm font-medium mb-2">
+                                    <CalendarIcon className="h-4 w-4" />
+                                    Arriving on
+                                </label>
                                 <FormControl>
                                     <DateSelect field={field} disableDates={true} />
                                 </FormControl>
                             </FormItem>
                         )}
                     />
-                    <FormField 
-                        control={form.control}
-                        name='arrivingtime'
-                        render={({ field }) => (
-                            <FormItem className='lg:w-[250px] grid'>
-                                <FormLabel>Arriving on</FormLabel>
-                                <FormControl>
-                                    <TimeSelect onChange={field.onChange} defaultValue={field.value} />
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
-                    <FormField 
-                        control={form.control}
-                        name='leavingtime'
-                        render={({ field }) => (
-                            <FormItem className='lg:w-[250px] grid'>
-                                <FormLabel>Leaving on</FormLabel>
-                                <FormControl>
-                                    <TimeSelect 
-                                    disableTime={form.getValues('arrivingtime')}
-                                    onChange={field.onChange} defaultValue={field.value} />
-                                </FormControl>
-                            </FormItem>
-                        )}
-                    />
 
-                    <Button type='submit'>Submit</Button>
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name='arrivingtime'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <label className="flex items-center gap-2 text-sm font-medium mb-2">
+                                        <Clock className="h-4 w-4" />
+                                        Arriving time
+                                    </label>
+                                    <FormControl>
+                                        <TimeSelect onChange={field.onChange} defaultValue={field.value} />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name='leavingtime'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <label className="flex items-center gap-2 text-sm font-medium mb-2">
+                                        <Clock className="h-4 w-4" />
+                                        Leaving time
+                                    </label>
+                                    <FormControl>
+                                        <TimeSelect
+                                            disableTime={form.getValues('arrivingtime')}
+                                            onChange={field.onChange}
+                                            defaultValue={field.value}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800">
+                        <Search className="mr-2 h-4 w-4" />
+                        Find Parking
+                    </Button>
                 </form>
             </Form>
         </div>

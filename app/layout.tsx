@@ -5,6 +5,8 @@ import { Inter as FontSans } from "next/font/google"
 import { cn } from '@/lib/utils'
 import { Toaster } from "sonner";
 import { ClerkLoaded, ClerkProvider } from "@clerk/nextjs";
+import Navigation from "@/components/navigation"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -14,31 +16,38 @@ const fontSans = FontSans({
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "APLMS",
-  description: "parking system for APLMS",
+  title: "APLMS - Advanced Parking Lot Management System",
+  description: "Find and reserve parking spots with ease",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
-          className={cn(inter.className,
+          className={cn(
             "min-h-screen bg-background font-sans antialiased",
             fontSans.variable
           )}
         >
-          <ClerkLoaded>
-            {children}
-          </ClerkLoaded>
-          <Toaster />
-          </body>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ClerkLoaded>
+              <Navigation />
+              <main>{children}</main>
+            </ClerkLoaded>
+            <Toaster />
+          </ThemeProvider>
+        </body>
       </html>
     </ClerkProvider>
-
   );
 }

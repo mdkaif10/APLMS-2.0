@@ -162,3 +162,10 @@ export function blockPostion(starttime: Date) {
   const m = getMinutes(starttime)
   return (h * 60) + m
 }
+
+export function scrollToSection(sectionId: string) {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}

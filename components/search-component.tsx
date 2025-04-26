@@ -57,20 +57,22 @@ function SearchComponent() {
   }
 
   return (
-    <div className="flex-flex-col -mt-16 w-full p-4 py-10 item-start gap-x-2 rounded-2xl bg-gray-50 ring-1 ring-inset ring-gray-900/5">
-        <SearchForm onSearch={handleSearchDone}/>
-        {
-          search.length > 0 ? 
-          <div className="flex">
-            <div className="p-1 flex-none w-56 overflow-auto h-[600px]">
-              <SearchResult locations={search} params={searchParams as SearchParams} />
-            </div>
-            <div className="flex-1">
-              <Map mapParams={JSON.stringify(search)} />
-            </div>
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="p-6">
+        <SearchForm onSearch={handleSearchDone} />
+      </div>
+      {search.length > 0 ? (
+        <div className="flex flex-col lg:flex-row">
+          <div className="lg:w-1/3 border-r border-gray-200 overflow-auto max-h-[600px]">
+            <SearchResult locations={search} params={searchParams as SearchParams} />
           </div>
-          : <p className="text-center pt-12 pb-12 text-xl sm:text-4xl text-slate-300">{message}</p>
-        }
+          <div className="lg:w-2/3 h-[600px]">
+            <Map mapParams={JSON.stringify(search)} />
+          </div>
+        </div>
+      ) : (
+        <p className="text-center py-8 text-gray-500">{message}</p>
+      )}
     </div>
   )
 }
