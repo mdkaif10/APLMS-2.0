@@ -2,6 +2,8 @@ import { NextResponse, NextRequest } from 'next/server'
 import { getAuth } from '@clerk/nextjs/server'
 import prisma from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 interface BookingWithUser {
   id: string
   userId: string

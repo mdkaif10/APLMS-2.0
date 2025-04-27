@@ -12,6 +12,7 @@ import { compareAsc, format, formatDate } from "date-fns"
 import { revalidatePath } from "next/cache"
 import { Resend } from 'resend'
 import { ContactModel } from "@/schemas/contact"
+import { Document } from "mongoose"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -79,7 +80,7 @@ export async function findNearbyLocations(maxDistance: number, searchParams: Sea
         const st = new Date(`${searchParams.arrivingon}T${searchParams.arrivingtime}`)
         const et = new Date(`${searchParams.arrivingon}T${searchParams.leavingtime}`)
 
-        const parkingLocations: ParkingLocation[] = await ParkingLocationModel.find({
+        const parkingLocations = await ParkingLocationModel.find({
             location: {
                 $nearSphere: {
                     $geometry: {
@@ -89,7 +90,7 @@ export async function findNearbyLocations(maxDistance: number, searchParams: Sea
                     $maxDistance: maxDistance // meters
                 }
             }
-        }).lean()
+        }).lean() as unknown as ParkingLocation[];
 
         // go through all locations and find the bookings for it
         const availableLocations =
@@ -293,7 +294,7 @@ export async function updateBooking(selfid: string, date: Date, starttime: strin
         }
 
         const parkingLocation =
-            await ParkingLocationModel.findById(originalBooking.locationid).lean() as ParkingLocation
+            await ParkingLocationModel.findById(originalBooking.locationid).lean() as unknown as Omit<ParkingLocation, keyof Document>;
 
         const originalStarttime = originalBooking.starttime
         const originalEndtime = originalBooking.endtime
