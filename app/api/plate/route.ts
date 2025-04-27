@@ -2,10 +2,12 @@ import { sendViolationEmail } from "@/actions/actions"
 import { BookingModel } from "@/schemas/booking"
 import { BookingStatus } from "@/types"
 import { NextResponse } from "next/server"
+import { connectToDB } from "@/lib/db"
 
 export async function POST(req: Request) {
-
     try {
+        // Connect to database first
+        await connectToDB()
 
         const body = await req.json()
         const authHeader = req.headers.get('authorization')
@@ -16,10 +18,18 @@ export async function POST(req: Request) {
 
         const token = authHeader.split(' ')[1]
         if (token !== process.env.APP_KEY) {
-            return NextResponse.json({message: "Wrong credentials"}, {status: 404})
+            return NextResponse.json({message: "Wrong credentials"}, {status: 401})
         }
 
         const { plate, address, timestamp } = body
+
+        if (!plate || !address || !timestamp) {
+            return NextResponse.json({
+                message: "Missing required fields",
+                required: ["plate", "address", "timestamp"],
+                received: { plate, address, timestamp }
+            }, { status: 400 })
+        }
 
         const booking = await BookingModel.findOne({
             plate: plate.toLowerCase(),
@@ -34,11 +44,17 @@ export async function POST(req: Request) {
         }
 
         return NextResponse.json({
-            message: "ok"
+            message: "ok",
+            plate,
+            hasBooking: !!booking
         })
 
     } catch(error) {
-        console.log("Error: ", error)
-        throw error
+        console.error("Plate API Error:", error)
+        return NextResponse.json({
+            message: "Internal server error",
+            error: error instanceof Error ? error.message : "Unknown error",
+            stack: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.stack : undefined : undefined
+        }, { status: 500 })
     }
 }
