@@ -412,3 +412,23 @@ export async function createContactMessage(data: {
         }
     }
 }
+
+export async function deleteContactMessage(id: string) {
+    try {
+        await connectToDB();
+        await ContactModel.findByIdAndDelete(id);
+        return { code: 0, message: 'Message deleted' };
+    } catch (error) {
+        return { code: 1, message: 'Failed to delete message', error };
+    }
+}
+
+export async function markContactMessageRead(id: string) {
+    try {
+        await connectToDB();
+        await ContactModel.findByIdAndUpdate(id, { status: 'read' });
+        return { code: 0, message: 'Message marked as read' };
+    } catch (error) {
+        return { code: 1, message: 'Failed to mark as read', error };
+    }
+}

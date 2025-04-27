@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Mail } from "lucide-react"
+import MessageActions from './_components/MessageActions'
 
 async function MessagesPage() {
   await connectToDB()
@@ -60,9 +61,12 @@ async function MessagesPage() {
                   <p className="text-xs text-muted-foreground">
                     {format(new Date(message.createdAt), 'PPp')}
                   </p>
-                  <Button variant="outline" size="sm">
-                    Reply
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm">
+                      Reply
+                    </Button>
+                    <MessageActions id={message._id} status={message.status} />
+                  </div>
                 </div>
               </CardContent>
             </Card>

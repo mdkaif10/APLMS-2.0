@@ -15,9 +15,11 @@ export default function AboutPage() {
     subject: "",
     message: "",
   })
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
     try {
       const response = await createContactMessage(formData)
       if (response.code === 0) {
@@ -34,6 +36,8 @@ export default function AboutPage() {
     } catch (error) {
       toast.error("An error occurred. Please try again.")
     }
+    await new Promise(res => setTimeout(res, 2000)); // 2 second delay
+    setLoading(false)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -258,9 +262,20 @@ export default function AboutPage() {
                   <Button 
                     type="submit" 
                     className="w-full"
+                    disabled={loading}
+                    style={{ display: loading ? 'none' : 'block' }}
                   >
                     Send Message
                   </Button>
+                  {loading && (
+                    <div className="flex flex-col items-center justify-center py-2">
+                      <span className="animate-bounce text-lg font-semibold text-primary">Sir, ab toh number de dijiye</span>
+                      <svg className="animate-spin h-6 w-6 text-primary mt-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                      </svg>
+                    </div>
+                  )}
                 </form>
               </div>
             </div>
