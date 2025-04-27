@@ -8,7 +8,7 @@ function GuestLayout({
     <div className="flex flex-col min-h-screen">
         <Banner />
         <main className="flex-1 pt-16">
-            {children}
+        {children}
         </main>
     </div>
   )

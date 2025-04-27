@@ -78,14 +78,14 @@ export default function Navigation() {
         </nav>
         <div className="flex items-center space-x-4">
           {isSignedIn ? (
-            <>
-              <Link
-                href="/mybookings"
-                className={cn(
-                  "text-muted-foreground hover:text-foreground transition-colors duration-200",
-                  pathname === "/mybookings" && "text-foreground"
-                )}
-              >
+             <>
+             <Link
+               href="/mybookings"
+               className={cn(
+                 "text-muted-foreground hover:text-foreground transition-colors duration-200",
+                 pathname === "/mybookings" && "text-foreground"
+               )}
+             >
                 My Bookings
               </Link>
               <Link 

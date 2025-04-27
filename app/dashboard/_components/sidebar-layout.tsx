@@ -10,10 +10,10 @@ export function SidebarLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="flex min-h-screen">
-            <MobileSidebar open={open} setOpen={setOpen} />
-            <DesktopSidebar />
+                <MobileSidebar open={open} setOpen={setOpen} />
+                <DesktopSidebar />
             <div className="flex-1">
-                {children}
+                    {children}
             </div>
         </div>
     )
