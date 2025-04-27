@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
-import { getAuth } from '@clerk/nextjs/server'
-import prisma from '@/lib/prisma'
+import { getAuth, clerkClient } from '@clerk/nextjs/server'
+import { User } from '@clerk/nextjs/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,16 +12,18 @@ export async function GET(request: NextRequest) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-      },
+    const { data: users } = await clerkClient.users.getUserList({
+      limit: 100,
     })
 
-    return NextResponse.json(users)
+    const formattedUsers = users.map((user: User) => ({
+      id: user.id,
+      name: `${user.firstName} ${user.lastName}`.trim(),
+      email: user.emailAddresses[0]?.emailAddress,
+      role: user.publicMetadata?.role || 'user',
+    }))
+
+    return NextResponse.json(formattedUsers)
   } catch (error) {
     console.error('[USERS_GET]', error)
     return new NextResponse('Internal error', { status: 500 })
