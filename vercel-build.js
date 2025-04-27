@@ -3,54 +3,76 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // Function to log with timestamp
-function log(message) {
+function log(message, type = 'info') {
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] ${message}`);
+  const prefix = type === 'error' ? '❌ ERROR' : type === 'warn' ? '⚠️ WARN' : 'ℹ️ INFO';
+  console.log(`[${timestamp}] ${prefix}: ${message}`);
+}
+
+// Function to check if a directory exists
+function ensureDirectoryExists(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    log(`Creating directory: ${dirPath}`);
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+}
+
+// Function to create an empty file if it doesn't exist
+function ensureFileExists(filePath, content = '') {
+  if (!fs.existsSync(filePath)) {
+    log(`Creating file: ${filePath}`);
+    fs.writeFileSync(filePath, content);
+  }
 }
 
 try {
+  // Clean the .next directory if it exists
+  const nextDir = path.join(process.cwd(), '.next');
+  if (fs.existsSync(nextDir)) {
+    log('Cleaning .next directory');
+    fs.rmSync(nextDir, { recursive: true, force: true });
+  }
+
   // Run the Next.js build
   log('Running Next.js build...');
   execSync('next build', { stdio: 'inherit' });
 
-  // Create the missing directory and file if they don't exist
+  // Create the missing directory and file
   const guestDir = path.join(process.cwd(), '.next', 'server', 'app', '(guest)');
   const manifestFile = path.join(guestDir, 'page_client-reference-manifest.js');
 
-  // Create the directory if it doesn't exist
-  if (!fs.existsSync(guestDir)) {
-    log('Creating missing directory: ' + guestDir);
-    fs.mkdirSync(guestDir, { recursive: true });
-  }
+  // Ensure directories and files exist
+  ensureDirectoryExists(guestDir);
+  ensureFileExists(manifestFile, '// Empty manifest file to prevent build errors');
 
-  // Create an empty manifest file if it doesn't exist
-  if (!fs.existsSync(manifestFile)) {
-    log('Creating empty manifest file: ' + manifestFile);
-    fs.writeFileSync(manifestFile, '// Empty manifest file to prevent build errors');
-  }
-
-  // Check if the file was created successfully
-  if (fs.existsSync(manifestFile)) {
-    log('Manifest file created successfully');
-  } else {
-    log('WARNING: Failed to create manifest file');
-  }
-
-  // Check for other potential issues
-  const nextDir = path.join(process.cwd(), '.next');
+  // Verify the build output
   if (!fs.existsSync(nextDir)) {
-    log('ERROR: .next directory not found after build');
-  } else {
-    log('.next directory exists');
+    throw new Error('.next directory not found after build');
+  }
+
+  // Check for critical files
+  const criticalFiles = [
+    '.next/server/app/page.js',
+    '.next/server/app/guest/page.js',
+    '.next/server/app/dashboard/page.js'
+  ];
+
+  for (const file of criticalFiles) {
+    const filePath = path.join(process.cwd(), file);
+    if (!fs.existsSync(filePath)) {
+      log(`Critical file missing: ${file}`, 'warn');
+    } else {
+      log(`Verified file exists: ${file}`);
+    }
   }
 
   log('Build completed successfully!');
 } catch (error) {
-  log('ERROR during build process:');
-  log(error.message);
+  log('Build process failed:', 'error');
+  log(error.message, 'error');
   if (error.stack) {
-    log('Stack trace:');
-    log(error.stack);
+    log('Stack trace:', 'error');
+    log(error.stack, 'error');
   }
   process.exit(1);
 } 
