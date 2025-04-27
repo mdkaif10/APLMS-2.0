@@ -103,7 +103,7 @@ function BookPage() {
                             </div>
                             <div className="flex justify-between text-sm font-bold">
                                 <p>{diffInHours} Hours</p>
-                                <p>{location ? formatAmountForDisplay(diffInHours * location.price.hourly, 'CAD') : '...'}</p>
+                                <p>{location ? formatAmountForDisplay(diffInHours * location.price.hourly, 'INR') : '...'}</p>
                             </div>
                         </div>
 
