@@ -14,6 +14,23 @@ let globalWithMongo = global as typeof globalThis & {
     _mongooseClient?: Mongoose
 }
 
+// Set max listeners to prevent warning
+mongoose.connection.setMaxListeners(20)
+
+// Store event listener references for cleanup
+const eventListeners = {
+    connected: () => console.log('MongoDB connected successfully'),
+    error: (err: Error) => console.error('MongoDB connection error:', err),
+    disconnected: () => console.log('MongoDB disconnected')
+}
+
+// Function to remove event listeners
+const removeEventListeners = () => {
+    mongoose.connection.removeListener('connected', eventListeners.connected)
+    mongoose.connection.removeListener('error', eventListeners.error)
+    mongoose.connection.removeListener('disconnected', eventListeners.disconnected)
+}
+
 export const clientPromise = async () => {
     await connectToDB()
     return Promise.resolve<MongoClientType>(client)
@@ -21,6 +38,9 @@ export const clientPromise = async () => {
 
 export const connectToDB = async () => {
     try {
+        // Remove any existing listeners before adding new ones
+        removeEventListeners()
+
         if (process.env.NODE_ENV === 'development') {
             if (!globalWithMongo._mongooseClient) {
                 globalWithMongo._mongooseClient = await mongoose.connect(uri, {
@@ -39,24 +59,20 @@ export const connectToDB = async () => {
             client = _client.connection.getClient()
         }
 
-        // Add connection event listeners
-        mongoose.connection.on('connected', () => {
-            console.log('MongoDB connected successfully')
-        })
-
-        mongoose.connection.on('error', (err) => {
-            console.error('MongoDB connection error:', err)
-        })
-
-        mongoose.connection.on('disconnected', () => {
-            console.log('MongoDB disconnected')
-        })
+        // Add event listeners
+        mongoose.connection.on('connected', eventListeners.connected)
+        mongoose.connection.on('error', eventListeners.error)
+        mongoose.connection.on('disconnected', eventListeners.disconnected)
 
         // Handle process termination
-        process.on('SIGINT', async () => {
+        const cleanup = async () => {
+            removeEventListeners()
             await mongoose.connection.close()
             process.exit(0)
-        })
+        }
+
+        process.on('SIGINT', cleanup)
+        process.on('SIGTERM', cleanup)
 
     } catch (error) {
         console.error('MongoDB connection error:', error)
