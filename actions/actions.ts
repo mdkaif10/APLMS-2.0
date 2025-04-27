@@ -11,7 +11,6 @@ import { currentUser } from "@clerk/nextjs/server"
 import { compareAsc, format, formatDate } from "date-fns"
 import { revalidatePath } from "next/cache"
 import { Resend } from 'resend'
-import { ContactModel } from "@/schemas/contact"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -383,31 +382,5 @@ export async function deleteBooking(bookingid: string) {
 
     } catch (error) {
         throw error
-    }
-}
-
-export async function createContactMessage(data: {
-    name: string;
-    email: string;
-    subject: string;
-    message: string;
-}): Promise<ActionResponse> {
-    try {
-        await connectToDB()
-        
-        const contact = await ContactModel.create(data)
-        
-        return {
-            code: 0,
-            message: 'Message sent successfully',
-            data: contact
-        }
-    } catch (error) {
-        console.error(error)
-        return {
-            code: 1,
-            message: 'Failed to send message',
-            error
-        }
     }
 }

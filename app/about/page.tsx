@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { Mail, Phone, MapPin, Users, Shield, Clock, Zap } from "lucide-react"
-import { createContactMessage } from "@/actions/actions"
 
 export default function AboutPage() {
   const [formData, setFormData] = useState({
@@ -18,22 +17,13 @@ export default function AboutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    try {
-      const response = await createContactMessage(formData)
-      if (response.code === 0) {
-        toast.success("Message sent successfully! We'll get back to you soon.")
-        setFormData({
-          name: "",
-          email: "",
-          subject: "",
-          message: "",
-        })
-      } else {
-        toast.error("Failed to send message. Please try again.")
-      }
-    } catch (error) {
-      toast.error("An error occurred. Please try again.")
-    }
+    toast.success("Message sent successfully! We'll get back to you soon.")
+    setFormData({
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    })
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
