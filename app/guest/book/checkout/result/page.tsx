@@ -10,6 +10,7 @@ import React from "react"
 import { CheckCircle2 } from "lucide-react"
 import { sendConfirmationEmail } from "@/actions/actions"
 import { currentUser } from "@clerk/nextjs/server"
+import { formatAmountForDisplay } from '@/lib/utils'
 
 async function BookingCheckoutResultPage({
     searchParams
@@ -40,6 +41,7 @@ async function BookingCheckoutResultPage({
     let arrivingon = ''
     let leavingon = ''
     let plate = ''
+    let amount = 0
 
     if (paymentIntent.status === 'succeeded') {
         const metadata = checkoutSession.metadata as Metadata
@@ -57,6 +59,7 @@ async function BookingCheckoutResultPage({
             arrivingon = formatDate(booking?.starttime!, 'hh:mm a')
             leavingon = formatDate(booking?.endtime!, 'hh:mm a')
             plate = booking.plate
+            amount = booking.amount
 
             if (booking.status === BookingStatus.PENDING) {
                 booking.status = BookingStatus.BOOKED
@@ -114,6 +117,14 @@ async function BookingCheckoutResultPage({
                                 </p>
                                 <p className='text-zinc-700 place-self-start'>
                                     {plate.toUpperCase()}
+                                </p>
+                            </div>
+                            <div className="grid grid-cols-2 place-items center sm:place-items-start">
+                                <p className="text-zinc-700">
+                                    Amount paid:
+                                </p>
+                                <p className="text-zinc-700 place-self-start">
+                                    {amount ? formatAmountForDisplay(amount, 'INR') : ''}
                                 </p>
                             </div>
                         </div>

@@ -43,7 +43,7 @@ function SearchResult({
                                     buttonVariants({ variant: 'default' }),
                                     'w-full mt-4 bg-black text-white hover:bg-gray-800'
                                 )}
-                                href={`book/${loc.id}?date=${params.arrivingon}&starttime=${params.arrivingtime}&endtime=${params.leavingtime}`}
+                                href={`guest/book/${loc.id}?date=${params.arrivingon}&starttime=${params.arrivingtime}&endtime=${params.leavingtime}`}
                             >
                                 Book Now
                             </Link>
