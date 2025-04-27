@@ -80,10 +80,10 @@ export default function Navigation() {
           {isSignedIn ? (
             <>
               <Link
-                href="/guest/mybookings"
+                href="/mybookings"
                 className={cn(
                   "text-muted-foreground hover:text-foreground transition-colors duration-200",
-                  pathname === "/guest/mybookings" && "text-foreground"
+                  pathname === "/mybookings" && "text-foreground"
                 )}
               >
                 My Bookings

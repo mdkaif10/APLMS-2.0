@@ -7,7 +7,7 @@ import { ParkingLocation, ParkingLocationModel } from "@/schemas/parking-locatio
 import { formatDate } from "date-fns"
 import { BookingStatus } from "@/types"
 import React from "react"
-import { CheckCircle2 } from "lucide-react"
+import { CheckCircle2, XCircle } from "lucide-react"
 import { sendConfirmationEmail } from "@/actions/actions"
 import { currentUser } from "@clerk/nextjs/server"
 import { formatAmountForDisplay } from '@/lib/utils'
@@ -21,17 +21,50 @@ async function BookingCheckoutResultPage({
     const user = await currentUser()
 
     if (!session_id) {
-        throw new Error("Invalid session id")
+        return (
+            <main className="sm:container flex flex-col items-center pt-16">
+                <XCircle size={64} className="text-red-500" />
+                <h1 className="text-2xl font-bold text-red-500 mt-4">Invalid Session</h1>
+                <p className="text-gray-600 mt-2">The booking session is invalid or has expired.</p>
+            </main>
+        )
     }
 
     if (!user) {
-        throw new Error("You must be logged in")
+        return (
+            <main className="sm:container flex flex-col items-center pt-16">
+                <XCircle size={64} className="text-red-500" />
+                <h1 className="text-2xl font-bold text-red-500 mt-4">Authentication Required</h1>
+                <p className="text-gray-600 mt-2">Please log in to view your booking details.</p>
+            </main>
+        )
     }
     
-    const checkoutSession: Stripe.Checkout.Session =
-        await stripe.checkout.sessions.retrieve(session_id, {
+    let checkoutSession: Stripe.Checkout.Session
+    try {
+        checkoutSession = await stripe.checkout.sessions.retrieve(session_id, {
             expand: ['payment_intent']
         })
+    } catch (error) {
+        console.error('Failed to retrieve checkout session:', error)
+        return (
+            <main className="sm:container flex flex-col items-center pt-16">
+                <XCircle size={64} className="text-red-500" />
+                <h1 className="text-2xl font-bold text-red-500 mt-4">Session Error</h1>
+                <p className="text-gray-600 mt-2">Failed to retrieve booking information. Please contact support if this persists.</p>
+            </main>
+        )
+    }
+
+    if (!checkoutSession.payment_intent) {
+        return (
+            <main className="sm:container flex flex-col items-center pt-16">
+                <XCircle size={64} className="text-red-500" />
+                <h1 className="text-2xl font-bold text-red-500 mt-4">Payment Error</h1>
+                <p className="text-gray-600 mt-2">Payment information not found. Please contact support.</p>
+            </main>
+        )
+    }
 
     const paymentIntent = checkoutSession.payment_intent as Stripe.PaymentIntent
     const paymentStatus = paymentIntent.status === 'succeeded' ? 'Payment Successful' : 'Payment failed'
