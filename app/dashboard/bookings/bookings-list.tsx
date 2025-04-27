@@ -48,6 +48,13 @@ function BookingList() {
         (async () => {
             const result = await getParkingLocations()
             setLocations(result)
+            if (result.length > 0) {
+                // Set default location in form and params if not already set
+                if (!params.id) {
+                    setParams(prev => ({ ...prev, id: result[0]._id as string }))
+                }
+                form.setValue('location', result[0]._id as string)
+            }
         })()
     }, [])
 
